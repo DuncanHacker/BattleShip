@@ -12,16 +12,14 @@ namespace BattleShip
 	}
 	public class Ship
 	{
-		public string Name { get; set; }
-		public int Player { get; set; }
+		public string Name { get; set; }		
 		public Coordinates[] Coordinates { get; set; }
 		public ShipType ShipType { get; set; }
 		public int Size { get; set; }
 
-		public Ship(string name, int player)
+		public Ship(string name)
 		{
-			Name = name;
-			Player = player;
+			Name = name;			
 			switch (name)
 			{
 				case "Carrier":
