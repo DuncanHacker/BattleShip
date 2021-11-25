@@ -30,7 +30,7 @@ namespace BattleShip
 			{
 				Console.Write("[" + (i + 1) + "]");
 			}
-			ShipPlacement(player1, player2);
+			ShipPlacement(ref player1, ref player2);
 		}
 		static void MainMenu()
 		{
@@ -118,45 +118,53 @@ namespace BattleShip
 				}
 			}
 		}
-		static void ShipPlacement(Player player1, Player player2)
+		static void ShipPlacement(ref Player player1, ref Player player2)
 		{
 			//Player 1 => false, Player 2 => true
 			bool ActivePlayer = false;
-			if (!ActivePlayer)
+			int remainingShips = 10;
+			while (remainingShips > 0)
 			{
-				Console.WriteLine("Player " + player1.Name + " place your ship!");
-				Console.WriteLine
-					(player1.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
-				int choosenShip = int.Parse(Console.ReadLine());
-				for (int i = 0; i < player1.Inventory[choosenShip + 1].Coordinates.Length; i++)
+				if (!ActivePlayer)
 				{
-					Console.WriteLine("X Coordinate: ");
-					int xcoordinate = int.Parse(Console.ReadLine());
-					Console.WriteLine("Y Coordinate: ");
-					int ycoordinate = int.Parse(Console.ReadLine());
-					player1.Inventory[choosenShip + 1].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
-					Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip + 1].Name + "'s X coordinate is now: " + player1.Inventory[choosenShip + 1].Coordinates[i].xCoordinate);
-					Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip + 1].Name + "'s Y coordinate is now: " + player1.Inventory[choosenShip + 1].Coordinates[i].yCoordinate);
-				}				
-				ActivePlayer = !ActivePlayer;
-
-			} else if (ActivePlayer)
-			{
-				Console.WriteLine("Player " + player2.Name + " place your ship!");
-				Console.WriteLine
-					(player2.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
-				int choosenShip = int.Parse(Console.ReadLine());
-				for (int i = 0; i < player2.Inventory[choosenShip + 1].Coordinates.Length; i++)
+					Console.WriteLine("Player " + player1.Name + " place your ship!");
+					Console.WriteLine
+						(player1.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
+					int choosenShip = int.Parse(Console.ReadLine());
+					choosenShip--;
+					for (int i = 0; i < player1.Inventory[choosenShip].Coordinates.Length; i++)
+					{
+						Console.WriteLine("X Coordinate: ");
+						int xcoordinate = int.Parse(Console.ReadLine());
+						Console.WriteLine("Y Coordinate: ");
+						int ycoordinate = int.Parse(Console.ReadLine());
+						player1.Inventory[choosenShip].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
+						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s X coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].xCoordinate);
+						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s Y coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].yCoordinate);
+					}					
+				}
+				else if (ActivePlayer)
 				{
-					Console.WriteLine("X Coordinate: ");
-					int xcoordinate = int.Parse(Console.ReadLine());
-					Console.WriteLine("Y Coordinate: ");
-					int ycoordinate = int.Parse(Console.ReadLine());
-					player2.Inventory[choosenShip + 1].Coordinates[i].xCoordinate = xcoordinate;
-					player2.Inventory[choosenShip + 1].Coordinates[i].yCoordinate = ycoordinate;
+					Console.WriteLine("Player " + player2.Name + " place your ship!");
+					Console.WriteLine
+						(player2.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
+					int choosenShip = int.Parse(Console.ReadLine());
+					choosenShip--;
+					for (int i = 0; i < player2.Inventory[choosenShip].Coordinates.Length; i++)
+					{
+						Console.WriteLine("X Coordinate: ");
+						int xcoordinate = int.Parse(Console.ReadLine());
+						Console.WriteLine("Y Coordinate: ");
+						int ycoordinate = int.Parse(Console.ReadLine());
+						player2.Inventory[choosenShip].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
+						Console.WriteLine(player2.Name + "'s " + player2.Inventory[choosenShip].Name + "'s X coordinate is now: " + player2.Inventory[choosenShip].Coordinates[i].xCoordinate);
+						Console.WriteLine(player2.Name + "'s " + player2.Inventory[choosenShip].Name + "'s Y coordinate is now: " + player2.Inventory[choosenShip].Coordinates[i].yCoordinate);
+					}
 				}
 				ActivePlayer = !ActivePlayer;
-			}
+				Console.WriteLine("Remaining ships: " + remainingShips);
+				remainingShips--;
+			}			
 		}
 	}
 }
