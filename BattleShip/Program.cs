@@ -6,7 +6,7 @@ namespace BattleShip
 	{
 		static void Main(string[] args)
 		{
-			bool ActiveGame = false;			
+			bool ActiveGame = true;			
 			Player player1 = new Player("Duncan", ShipFactory());
 			Player player2 = new Player("Evil Duncan", ShipFactory());
 			Field[,] mapp1 = MapCreator();
@@ -30,7 +30,7 @@ namespace BattleShip
 			{
 				Console.Write("[" + (i + 1) + "]");
 			}
-			ShipPlacement(ref player1, ref player2);
+			ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2);
 		}
 		static void MainMenu()
 		{
@@ -85,7 +85,7 @@ namespace BattleShip
 				{
 					if (Map[i,j].ObjectStatus == ObjectStatus.water)
 					{
-						Console.ForegroundColor = ConsoleColor.DarkCyan;
+						Console.ForegroundColor = ConsoleColor.Cyan;
 						Console.Write("[~]");
 					} else if (Map[i, j].ObjectStatus == ObjectStatus.ship)
 					{
@@ -104,21 +104,10 @@ namespace BattleShip
 		{
 			while (activeGame == true)
 			{
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.WriteLine(player1.Name + "'s Map");
-				MapPrinter(mapp1);
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.WriteLine("-----------------------------------------------");
-				Console.WriteLine(player2.Name + "'s Map");
-				MapPrinter(mapp2);
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				for (int i = 0; i < 10; i++)
-				{
-					Console.Write("[" + (i + 1) + "]");
-				}
+				ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2);
 			}
 		}
-		static void ShipPlacement(ref Player player1, ref Player player2)
+		static void ShipPlacement(ref Player player1, ref Player player2, ref Field[,] mapp1, ref Field[,] mapp2)
 		{
 			//Player 1 => false, Player 2 => true
 			bool ActivePlayer = false;
@@ -141,6 +130,7 @@ namespace BattleShip
 						player1.Inventory[choosenShip].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
 						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s X coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].xCoordinate);
 						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s Y coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].yCoordinate);
+						mapp1[xcoordinate, ycoordinate].ObjectStatus = ObjectStatus.ship;					
 					}					
 				}
 				else if (ActivePlayer)
@@ -159,12 +149,18 @@ namespace BattleShip
 						player2.Inventory[choosenShip].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
 						Console.WriteLine(player2.Name + "'s " + player2.Inventory[choosenShip].Name + "'s X coordinate is now: " + player2.Inventory[choosenShip].Coordinates[i].xCoordinate);
 						Console.WriteLine(player2.Name + "'s " + player2.Inventory[choosenShip].Name + "'s Y coordinate is now: " + player2.Inventory[choosenShip].Coordinates[i].yCoordinate);
+						mapp2[xcoordinate, ycoordinate].ObjectStatus = ObjectStatus.ship;
 					}
 				}
+				Console.WriteLine("New Maps: ");
+				MapPrinter(mapp1);
+				Console.WriteLine("-------------------------------------------");
+				MapPrinter(mapp2);
 				ActivePlayer = !ActivePlayer;
 				Console.WriteLine("Remaining ships: " + remainingShips);
 				remainingShips--;
 			}			
 		}
+
 	}
 }
