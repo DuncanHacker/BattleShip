@@ -10,5 +10,14 @@ namespace BattleShip
 	{
 		public int xCoordinate { get; set; }
 		public int yCoordinate { get; set; }
+		public Coordinates()
+		{
+
+		}
+		public Coordinates(int x, int y)
+		{
+			xCoordinate = x;
+			yCoordinate = y;
+		}
 	}
 }
