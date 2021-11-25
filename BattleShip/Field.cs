@@ -8,7 +8,7 @@ namespace BattleShip
 {
 	public enum ObjectStatus
 	{
-		water, ship, destroyedship
+		water, ship, alreadyshot
 	}
 	public class Field
 	{

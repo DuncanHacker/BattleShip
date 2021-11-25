@@ -6,14 +6,14 @@ namespace BattleShip
 	{
 		static void Main(string[] args)
 		{
-			bool ActiveGame = true;			
+			bool activeGame = true;			
 			Player player1 = new Player("Duncan", ShipFactory());
 			Player player2 = new Player("Evil Duncan", ShipFactory());
 			Field[,] mapp1 = MapCreator();
 			Field[,] mapp2 = MapCreator();
-			GameStart(player1, player2, mapp1, mapp2);
+			GameStart(ref activeGame, player1, player2, mapp1, mapp2);
 		}
-		static void GameStart(Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
+		static void GameStart(ref bool activeGame, Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
 		{
 			MainMenu();			
 			MapCoordinates(ref mapp1);
@@ -30,7 +30,7 @@ namespace BattleShip
 			{
 				Console.Write("[" + (i + 1) + "]");
 			}
-			ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2);
+			GameLoop(ref activeGame, player1, player2, mapp1, mapp2);
 		}
 		static void MainMenu()
 		{
@@ -91,32 +91,34 @@ namespace BattleShip
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
 						Console.Write("[S]");
-					} else if (Map[i, j].ObjectStatus == ObjectStatus.destroyedship)
+					} else if (Map[i, j].ObjectStatus == ObjectStatus.alreadyshot)
 					{
 						Console.ForegroundColor = ConsoleColor.Red;
 						Console.Write("[X]");
-					}					
+					}	
 				}
 				Console.WriteLine();				
 			}
 		}
 		static void GameLoop(ref bool activeGame, Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
 		{
+			int remainingShips = 2;
 			while (activeGame == true)
 			{
-				ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2);
+				ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2, ref remainingShips);
+				Battle(ref activeGame, ref player1, ref player2, ref mapp1, ref mapp2);
 			}
 		}
-		static void ShipPlacement(ref Player player1, ref Player player2, ref Field[,] mapp1, ref Field[,] mapp2)
+		static void ShipPlacement(ref Player player1, ref Player player2, ref Field[,] mapp1, ref Field[,] mapp2, ref int remainingShips)
 		{
 			//Player 1 => false, Player 2 => true
 			bool ActivePlayer = false;
-			int remainingShips = 10;
+			
 			while (remainingShips > 0)
 			{
 				if (!ActivePlayer)
 				{
-					Console.WriteLine("Player " + player1.Name + " place your ship!");
+					Console.WriteLine("Commander " + player1.Name + " place your ship!");
 					Console.WriteLine
 						(player1.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
 					int choosenShip = int.Parse(Console.ReadLine());
@@ -135,7 +137,7 @@ namespace BattleShip
 				}
 				else if (ActivePlayer)
 				{
-					Console.WriteLine("Player " + player2.Name + " place your ship!");
+					Console.WriteLine("Commander " + player2.Name + " place your ship!");
 					Console.WriteLine
 						(player2.Name + ", which ship do you want to place? (Type the number: 1-> Carrier(5); 2-> Battleship(4); 3-> Destroyer(3); 4-> Submarine(3); 5-> Patrol Boat(2))");
 					int choosenShip = int.Parse(Console.ReadLine());
@@ -161,6 +163,22 @@ namespace BattleShip
 				remainingShips--;
 			}			
 		}
-
+		static void Battle(ref bool activeGame, ref Player player1, ref Player player2, ref Field[,] mapp1, ref Field[,] mapp2)
+		{
+			//Player 1 => false, Player 2 => true
+			bool ActivePlayer = false;
+			while (activeGame)
+			{
+				if (!ActivePlayer)
+				{
+					Console.WriteLine("Commander " + player1.Name + " what are the coordinates, where we should shoot?");
+					int xCoordinate = int.Parse(Console.ReadLine());
+					int yCoordinate = int.Parse(Console.ReadLine());
+					mapp2[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
+					MapPrinter(mapp1);
+					MapPrinter(mapp2);
+				}
+			}
+		}
 	}
 }
