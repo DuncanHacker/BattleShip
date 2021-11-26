@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace BattleShip
 {
@@ -30,7 +31,7 @@ namespace BattleShip
 			{
 				Console.Write("[" + (i + 1) + "]");
 			}
-			GameLoop(ref activeGame, player1, player2, mapp1, mapp2);
+			GameLoop(ref activeGame, ref player1, ref player2, mapp1, mapp2);
 		}
 		static void MainMenu()
 		{
@@ -100,7 +101,7 @@ namespace BattleShip
 				Console.WriteLine();				
 			}
 		}
-		static void GameLoop(ref bool activeGame, Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
+		static void GameLoop(ref bool activeGame, ref Player player1, ref Player player2, Field[,] mapp1, Field[,] mapp2)
 		{
 			int remainingShips = 2;
 			while (activeGame == true)
@@ -108,6 +109,7 @@ namespace BattleShip
 				ShipPlacement(ref player1, ref player2, ref mapp1, ref mapp2, ref remainingShips);
 				Battle(ref activeGame, ref player1, ref player2, ref mapp1, ref mapp2);
 			}
+			Console.WriteLine("Game Over!");
 		}
 		static void ShipPlacement(ref Player player1, ref Player player2, ref Field[,] mapp1, ref Field[,] mapp2, ref int remainingShips)
 		{
@@ -132,7 +134,7 @@ namespace BattleShip
 						player1.Inventory[choosenShip].Coordinates[i] = new Coordinates(xcoordinate, ycoordinate);
 						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s X coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].xCoordinate);
 						Console.WriteLine(player1.Name + "'s " + player1.Inventory[choosenShip].Name + "'s Y coordinate is now: " + player1.Inventory[choosenShip].Coordinates[i].yCoordinate);
-						mapp1[xcoordinate, ycoordinate].ObjectStatus = ObjectStatus.ship;					
+						mapp1[xcoordinate, ycoordinate].ObjectStatus = ObjectStatus.ship;
 					}					
 				}
 				else if (ActivePlayer)
@@ -158,6 +160,7 @@ namespace BattleShip
 				MapPrinter(mapp1);
 				Console.WriteLine("-------------------------------------------");
 				MapPrinter(mapp2);
+				AutoSave(mapp1, mapp2);
 				ActivePlayer = !ActivePlayer;
 				Console.WriteLine("Remaining ships: " + remainingShips);
 				remainingShips--;
@@ -174,11 +177,76 @@ namespace BattleShip
 					Console.WriteLine("Commander " + player1.Name + " what are the coordinates, where we should shoot?");
 					int xCoordinate = int.Parse(Console.ReadLine());
 					int yCoordinate = int.Parse(Console.ReadLine());
-					mapp2[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
+					if (mapp2[xCoordinate, yCoordinate].ObjectStatus == ObjectStatus.ship)
+					{
+						player2.Health--;
+						mapp2[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
+					} else
+						mapp2[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
 					MapPrinter(mapp1);
+					Console.WriteLine("----------------------");
 					MapPrinter(mapp2);
+					Console.WriteLine("Remaining Health for " + player1.Name + ": " + player1.Health);
+					Console.WriteLine("Remaining Health for " + player2.Name + ": " + player2.Health);
+					AutoSave(mapp1, mapp2);
+					if (player1.Health == 0 || player2.Health == 0)
+						activeGame = false;
+					ActivePlayer = !ActivePlayer;
+				} else
+				{
+					Console.WriteLine("Commander " + player2.Name + " what are the coordinates, where we should shoot?");
+					int xCoordinate = int.Parse(Console.ReadLine());
+					int yCoordinate = int.Parse(Console.ReadLine());
+					if (mapp1[xCoordinate, yCoordinate].ObjectStatus == ObjectStatus.ship)
+					{
+						player1.Health--;
+						mapp1[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
+					}
+					else
+						mapp1[xCoordinate, yCoordinate].ObjectStatus = ObjectStatus.alreadyshot;
+					MapPrinter(mapp1);
+					Console.WriteLine("-----------------------");
+					MapPrinter(mapp2);
+					Console.WriteLine("Remaining Health for " + player1.Name + ": " + player1.Health);
+					Console.WriteLine("Remaining Health for " + player2.Name + ": " + player2.Health);
+					AutoSave(mapp1, mapp2);
+					if (player1.Health == 0 || player2.Health == 0)
+						activeGame = false;
+					ActivePlayer = !ActivePlayer;
 				}
 			}
+		}
+		static void AutoSave(Field[,] mapp1, Field[,] mapp2)
+		{
+			StreamWriter streamWriter = new StreamWriter("savefile.txt");
+			for (int i = 0; i < mapp1.GetLength(0); i++)
+			{
+				for (int j = 0; j < mapp1.GetLength(1); j++)
+				{
+					if (mapp1[i, j].ObjectStatus == ObjectStatus.water)
+						streamWriter.Write("[~]");
+					else if (mapp1[i, j].ObjectStatus == ObjectStatus.ship)
+						streamWriter.Write("[S]");
+					else if (mapp1[i, j].ObjectStatus == ObjectStatus.alreadyshot)
+						streamWriter.Write("[X]");
+				}
+				streamWriter.WriteLine();
+			}
+			streamWriter.WriteLine("--------------------");
+			for (int i = 0; i < mapp2.GetLength(0); i++)
+			{
+				for (int j = 0; j < mapp2.GetLength(1); j++)
+				{
+					if (mapp2[i, j].ObjectStatus == ObjectStatus.water)
+						streamWriter.Write("[~]");
+					else if (mapp2[i, j].ObjectStatus == ObjectStatus.ship)
+						streamWriter.Write("[S]");
+					else if (mapp2[i, j].ObjectStatus == ObjectStatus.alreadyshot)
+						streamWriter.Write("[X]");
+				}
+				streamWriter.WriteLine();
+			}
+			streamWriter.Close();
 		}
 	}
 }
