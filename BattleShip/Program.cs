@@ -12,11 +12,11 @@ namespace BattleShip
 			Player player2 = new Player("Evil Duncan", ShipFactory());
 			Field[,] mapp1 = MapCreator();
 			Field[,] mapp2 = MapCreator();
-			GameStart(ref activeGame, player1, player2, mapp1, mapp2);
+			MainMenu(ref activeGame, player1, player2, mapp1, mapp2);
+			
 		}
 		static void GameStart(ref bool activeGame, Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
-		{
-			MainMenu();			
+		{						
 			MapCoordinates(ref mapp1);
 			MapCoordinates(ref mapp2);
 			Console.ForegroundColor = ConsoleColor.Cyan;
@@ -26,18 +26,23 @@ namespace BattleShip
 			Console.WriteLine("-----------------------------------------------");
 			Console.WriteLine(player2.Name + "'s Map");
 			MapPrinter(mapp2);
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			for (int i = 0; i < 10; i++)
-			{
-				Console.Write("[" + (i + 1) + "]");
-			}
 			GameLoop(ref activeGame, ref player1, ref player2, mapp1, mapp2);
 		}
-		static void MainMenu()
+		static void MainMenu(ref bool activeGame, Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
 		{
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine("Welcome to Battleship!");
 			Console.WriteLine();
+			Console.WriteLine("1. New Game");
+			Console.WriteLine("2. Load Game");
+			int choice = int.Parse(Console.ReadLine());
+			if (choice == 1)
+			{
+				GameStart(ref activeGame, player1, player2, mapp1, mapp2);
+			} else if (choice == 2)
+			{
+				LoadGame();
+			};
 		}
 		static Ship[] ShipFactory()
 		{
@@ -160,7 +165,7 @@ namespace BattleShip
 				MapPrinter(mapp1);
 				Console.WriteLine("-------------------------------------------");
 				MapPrinter(mapp2);
-				AutoSave(mapp1, mapp2);
+				AutoSave(player1, player2, mapp1, mapp2);
 				ActivePlayer = !ActivePlayer;
 				Console.WriteLine("Remaining ships: " + remainingShips);
 				remainingShips--;
@@ -188,7 +193,7 @@ namespace BattleShip
 					MapPrinter(mapp2);
 					Console.WriteLine("Remaining Health for " + player1.Name + ": " + player1.Health);
 					Console.WriteLine("Remaining Health for " + player2.Name + ": " + player2.Health);
-					AutoSave(mapp1, mapp2);
+					AutoSave(player1, player2, mapp1, mapp2);
 					if (player1.Health == 0 || player2.Health == 0)
 						activeGame = false;
 					ActivePlayer = !ActivePlayer;
@@ -209,16 +214,17 @@ namespace BattleShip
 					MapPrinter(mapp2);
 					Console.WriteLine("Remaining Health for " + player1.Name + ": " + player1.Health);
 					Console.WriteLine("Remaining Health for " + player2.Name + ": " + player2.Health);
-					AutoSave(mapp1, mapp2);
+					AutoSave(player1, player2, mapp1, mapp2);
 					if (player1.Health == 0 || player2.Health == 0)
 						activeGame = false;
 					ActivePlayer = !ActivePlayer;
 				}
 			}
 		}
-		static void AutoSave(Field[,] mapp1, Field[,] mapp2)
+		static void AutoSave(Player player1, Player player2, Field[,] mapp1, Field[,] mapp2)
 		{
 			StreamWriter streamWriter = new StreamWriter("savefile.txt");
+			streamWriter.WriteLine(player1.Name + "'s Map");
 			for (int i = 0; i < mapp1.GetLength(0); i++)
 			{
 				for (int j = 0; j < mapp1.GetLength(1); j++)
@@ -232,7 +238,8 @@ namespace BattleShip
 				}
 				streamWriter.WriteLine();
 			}
-			streamWriter.WriteLine("--------------------");
+			streamWriter.WriteLine("-----------------------------");
+			streamWriter.WriteLine(player2.Name + "'s Map");
 			for (int i = 0; i < mapp2.GetLength(0); i++)
 			{
 				for (int j = 0; j < mapp2.GetLength(1); j++)
@@ -247,6 +254,14 @@ namespace BattleShip
 				streamWriter.WriteLine();
 			}
 			streamWriter.Close();
+		}		
+		static void LoadGame()
+		{
+			StreamReader streamReader = new StreamReader("savefile.txt");
+			while (!streamReader.EndOfStream)
+			{
+				Console.WriteLine(streamReader.ReadLine());
+			}
 		}
 	}
 }
